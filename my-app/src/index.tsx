@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom/client';
-import { getDefaultCompilerOptions, isPropertyAccessOrQualifiedName } from 'typescript';
 import './index.css';
+
+import React, { useCallback, useState } from 'react';
+import ReactDOM from 'react-dom/client';
+import {
+  getDefaultCompilerOptions, isPropertyAccessOrQualifiedName,
+} from 'typescript';
 
 interface ISquareProps {
   value: string;
-  onClick: any;  
+  onClick: () => void;
 }
 
 function Square(props: ISquareProps) {
@@ -16,9 +19,24 @@ function Square(props: ISquareProps) {
   );
 }
 
-interface IBoardProps {
-  squares: string[];
-  onClick: any;  
+interface ISquareWrapperProps {
+  index: number;
+  value: string;
+  onClick: (inedx: number) => void;
+}
+
+function SquareWrapper(props: ISquareWrapperProps) {
+  const {
+    index,
+    value,
+    onClick,
+  } = props;
+  return (
+    <Square
+      value={ value }
+      onClick={() => onClick(index)}
+    />
+  );
 }
 
 // interface IBoardState {
@@ -26,7 +44,7 @@ interface IBoardProps {
 
 // class Board extends React.Component<IBoardProps, IBoardState> {
 //   renderSquare(i: number) {
-//     return <Square 
+//     return <Square
 //       value={this.props.squares[i]}
 //       onClick={() => this.props.onClick(i)}
 //     />;
@@ -55,33 +73,46 @@ interface IBoardProps {
 //   }
 // }
 
-function renderSquare(i: number, props: IBoardProps) {
-  return (
-    <Square
-      value={props.squares[i]}
-      onClick={() => props.onClick(i)}
-    />
-  ); 
-}
+
+// function renderSquare(i: number, props: IBoardProps) {
+//   return (
+//     <Square
+//       value={props.squares[i]}
+//       onClick={() => props.onClick(i)}
+//     />
+//   );
+// }
 
 
-function Board(props: IBoardProps) {  
+// interface IBoardProps {
+//   squares: string[];
+//   onClick: (i: number) => void;
+// }
+
+function Board({
+  squares,
+  onClick
+}: {
+  squares: string[];
+  onClick: (i: number) => void;
+}) {
+
   return (
     <div>
       <div className="board-row">
-        {renderSquare(0, props)}
-        {renderSquare(1, props)}
-        {renderSquare(2, props)}
+        <SquareWrapper index={0} value={ squares[0] } onClick={ onClick }/>
+        <SquareWrapper index={1} value={ squares[1] } onClick={ onClick }/>
+        <SquareWrapper index={2} value={ squares[2] } onClick={ onClick }/>
       </div>
       <div className="board-row">
-        {renderSquare(3, props)}
-        {renderSquare(4, props)}
-        {renderSquare(5, props)}
+        <SquareWrapper index={3} value={ squares[3] } onClick={ onClick }/>
+        <SquareWrapper index={4} value={ squares[4] } onClick={ onClick }/>
+        <SquareWrapper index={5} value={ squares[5] } onClick={ onClick }/>
       </div>
       <div className="board-row">
-        {renderSquare(6, props)}
-        {renderSquare(7, props)}
-        {renderSquare(8, props)}
+        <SquareWrapper index={6} value={ squares[6] } onClick={ onClick }/>
+        <SquareWrapper index={7} value={ squares[7] } onClick={ onClick }/>
+        <SquareWrapper index={8} value={ squares[8] } onClick={ onClick }/>
       </div>
     </div>
   );
@@ -106,7 +137,7 @@ function Game() {
         'Go to game start';
       return (
         <li key={move}>
-          <button 
+          <button
             onClick={() => {
               setStepNumber(move);
               setXIsNext((move % 2) === 0)
@@ -116,7 +147,21 @@ function Game() {
         </li>
       );
     }
-  )
+  );
+
+  const handleClick = useCallback((i: number) => {
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
+
+    if(calculateWinner(squares) || squares[i]) {
+      return;
+    }
+
+    squares[i] = xIsNext ? 'X' : 'O';
+    setHistory(history.concat([{squares: squares}]));
+    setStepNumber(history.length);
+    setXIsNext(!xIsNext);
+  }, [history, xIsNext]);
 
   let status: string;
   if (winner) {
@@ -127,24 +172,11 @@ function Game() {
 
   return (
     <div className="game">
-      <div className="game-board">      
+      <div className="game-board">
         <Board
           squares={current.squares}
-          onClick={
-            (i: number) => {
-              const current: ISquares = history[history.length - 1];
-              const squares: string[] = current.squares.slice();
-          
-              if(calculateWinner(squares) || squares[i]) {
-                return;
-              }
-          
-              squares[i] = xIsNext ? 'X' : 'O';
-              setHistory(history.concat([{squares: squares}]));
-              setStepNumber(history.length);
-              setXIsNext(!xIsNext);
-            }
-          } />
+          onClick={ handleClick }
+          />
       </div>
       <div className="game-info">
         <div>{status}</div>
@@ -164,7 +196,7 @@ function Game() {
 //       xIsNext: true,
 //       stepNumber: 0,
 //     }
-//   } 
+//   }
 
 //   handleClick(i: number) {
 //     const history: ISquares[] = this.state.history;
@@ -220,7 +252,7 @@ function Game() {
 
 //     return (
 //       <div className="game">
-//         <div className="game-board">      
+//         <div className="game-board">
 //           <Board
 //             squares={current.squares}
 //             onClick={(i: number) => this.handleClick(i)} />
