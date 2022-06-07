@@ -7,37 +7,44 @@ import {
 } from 'typescript';
 
 interface ISquareProps {
+  index: number;
   value: string;
-  onClick: () => void;
+  onClick: (index: number) => void;
 }
 
 function Square(props: ISquareProps) {
-  return (
-    <button className="square" onClick={props.onClick}>
-      {props.value}
-    </button>
-  );
-}
-
-interface ISquareWrapperProps {
-  index: number;
-  value: string;
-  onClick: (inedx: number) => void;
-}
-
-function SquareWrapper(props: ISquareWrapperProps) {
   const {
     index,
     value,
     onClick,
   } = props;
+
   return (
-    <Square
-      value={ value }
-      onClick={() => onClick(index)}
-    />
+    <button className="square" onClick={() => onClick(index)}>
+      {value}
+    </button>
   );
 }
+
+// interface ISquareWrapperProps {
+//   index: number;
+//   value: string;
+//   onClick: (inedx: number) => void;
+// }
+
+// function SquareWrapper(props: ISquareWrapperProps) {
+//   const {
+//     index,
+//     value,
+//     onClick,
+//   } = props;
+//   return (
+//     <Square
+//       value={ value }
+//       onClick={() => onClick(index)}
+//     />
+//   );
+// }
 
 // interface IBoardState {
 // }
@@ -84,35 +91,34 @@ function SquareWrapper(props: ISquareWrapperProps) {
 // }
 
 
-// interface IBoardProps {
-//   squares: string[];
-//   onClick: (i: number) => void;
-// }
-
-function Board({
-  squares,
-  onClick
-}: {
+interface IBoardProps {
   squares: string[];
   onClick: (i: number) => void;
-}) {
+}
 
+function Board(props: IBoardProps) {
+  const {
+    squares,
+    onClick,
+  } = props;
+  
+  // 괄호가 없는 함수는 값에 불과 (포인터), 괄호가 있으면 함수를 실행하는 것 (새로 생성하여)
   return (
     <div>
       <div className="board-row">
-        <SquareWrapper index={0} value={ squares[0] } onClick={ onClick }/>
-        <SquareWrapper index={1} value={ squares[1] } onClick={ onClick }/>
-        <SquareWrapper index={2} value={ squares[2] } onClick={ onClick }/>
+        <Square index={0} value={ squares[0] } onClick={ onClick }/>
+        <Square index={1} value={ squares[1] } onClick={ onClick }/>
+        <Square index={2} value={ squares[2] } onClick={ onClick }/>
       </div>
       <div className="board-row">
-        <SquareWrapper index={3} value={ squares[3] } onClick={ onClick }/>
-        <SquareWrapper index={4} value={ squares[4] } onClick={ onClick }/>
-        <SquareWrapper index={5} value={ squares[5] } onClick={ onClick }/>
+        <Square index={3} value={ squares[3] } onClick={ onClick }/>
+        <Square index={4} value={ squares[4] } onClick={ onClick }/>
+        <Square index={5} value={ squares[5] } onClick={ onClick }/>
       </div>
       <div className="board-row">
-        <SquareWrapper index={6} value={ squares[6] } onClick={ onClick }/>
-        <SquareWrapper index={7} value={ squares[7] } onClick={ onClick }/>
-        <SquareWrapper index={8} value={ squares[8] } onClick={ onClick }/>
+        <Square index={6} value={ squares[6] } onClick={ onClick }/>
+        <Square index={7} value={ squares[7] } onClick={ onClick }/>
+        <Square index={8} value={ squares[8] } onClick={ onClick }/>
       </div>
     </div>
   );
@@ -174,7 +180,7 @@ function Game() {
     <div className="game">
       <div className="game-board">
         <Board
-          squares={current.squares}
+          squares={ current.squares }
           onClick={ handleClick }
           />
       </div>
